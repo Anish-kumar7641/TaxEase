@@ -32,5 +32,5 @@ Follow these steps to set up the project locally:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/TaxEase.git
+git clone https://github.com/Anish-kumar7641/TaxEase.git
 cd TaxEase
