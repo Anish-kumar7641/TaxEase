@@ -25,7 +25,7 @@ function App() {
             <Route path="/financetracker" element={<FinanceTracker />} />
             <Route path="/taxcalculator" element={<TaxCalculator />} />
             <Route path="/taxoptimization" element={<TaxOptimization />} />
-            {/* <Route path="/taxfillingpage" element={<TaxFilingPage />} /> incomplete functionality */}
+            <Route path="/taxfillingpage" element={<TaxFilingPage />} /> 
           </Routes>
         </main>
         <Footer />
