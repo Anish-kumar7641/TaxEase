@@ -135,7 +135,7 @@ const TaxForm = () => {
     setLoading(true);
     try {
       // First, check for existing records
-      const response = await fetch('http://localhost:5000/api/tax/auto-fill', {
+      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/auto-fill', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ formData: formData })
@@ -152,7 +152,7 @@ const TaxForm = () => {
         });
       } else if (result.isNewUser) {
         // New user - save current form data
-        const saveResponse = await fetch('http://localhost:5000/api/tax/auto-fill', {
+        const saveResponse = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/auto-fill', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -191,7 +191,7 @@ const TaxForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/tax/auto-fill', {
+      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/auto-fill', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -227,7 +227,7 @@ const TaxForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/tax/validate', {
+      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -253,7 +253,7 @@ const TaxForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/tax/submit', {
+      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
