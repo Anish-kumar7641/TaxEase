@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { TrendingUp, Calculator, PieChart, FileText } from "lucide-react";
-import { dashboardData } from "/utils/api";
+import { dashData } from "../utils/api";
 import TaxFinanceDashboard from "../components/dashboardStats";
 
 const Dashboard = () => {
@@ -21,7 +21,7 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await dashboardData(token);
+        const response = await dashData(token);
 
         if (response.data.success) {
           setDashboardData(response.data.data);
