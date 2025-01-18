@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API = axios.create({ baseURL: "http://localhost:5000/api" });
+// const API = axios.create({ baseURL: "http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api" });
+
+const API = axios.create({baseURL:"http://localhost:5000/api"});
 
 // User-related API calls
 export const login = (formData) => API.post("/users/login", formData);
