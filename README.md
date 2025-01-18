@@ -34,3 +34,30 @@ Follow these steps to set up the project locally:
 ```bash
 git clone https://github.com/Anish-kumar7641/TaxEase.git
 cd TaxEase
+
+### 2. Install dependencies
+
+For the frontend:
+cd frontend
+npm install
+
+For the backend:
+cd backend
+npm install
+
+### 3. Set up environment variables in the backend
+
+Create a .env file in the backend directory with the following:
+MONGO_URI=mongodb://localhost:27017/taxease
+JWT_SECRET=your_jwt_secret
+
+### 4. Start the application
+
+Start the backend server:
+cd backend
+npm start
+
+Start the frontend development server:
+cd frontend
+npm start
+
