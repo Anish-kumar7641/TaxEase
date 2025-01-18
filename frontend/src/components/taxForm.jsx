@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { FileText, CheckCircle, AlertCircle, Download, Send } from "lucide-react";
 
+import { autoFill, validate, submitForm } from "../utils/api";
+
 const TaxForm = () => {
+  const [istaxvalid,setIstaxvalid] = useState(false);
   const [formData, setFormData] = useState({
     personalInfo: {
       name: "",
@@ -134,15 +137,10 @@ const TaxForm = () => {
 
     setLoading(true);
     try {
-      // First, check for existing records
-      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/auto-fill', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ formData: formData })
-      });
-
-      const result = await response.json();
-
+      
+      const token = localStorage.getItem('token');
+      const  response  = await autoFill({ formData, token });
+      const result=response.data;
       if (result.status === 'success' && !result.isNewUser) {
         // Existing user - auto-fill the form
         setFormData(prev => ({ ...prev, ...result.data }));
@@ -150,24 +148,13 @@ const TaxForm = () => {
           status: 'success',
           message: 'Form auto-filled with previous records'
         });
-      } else if (result.isNewUser) {
+      }
+       else if (result.isNewUser) {
         // New user - save current form data
-        const saveResponse = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/auto-fill', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            formData: formData
-          })
+        setValidationStatus({
+          status: 'success',
+          message: 'No previous records found. Please fill in your details.'
         });
-
-        const saveResult = await saveResponse.json();
-
-        if (saveResult.status === 'success') {
-          setValidationStatus({
-            status: 'success',
-            message: 'Your tax information has been validated saved successfully no need to submit now'
-          });
-        }
       }
     } catch (error) {
       console.error('Auto-fill error:', error);
@@ -191,16 +178,9 @@ const TaxForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/auto-fill', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          formData: formData
-        })
-      });
-
-      const result = await response.json();
-
+      const token = localStorage.getItem('token');
+      const  {response}  = await autoFill({ formData, token });
+      const result=response.data;
       if (result.status === 'success') {
         setValidationStatus({
           status: 'success',
@@ -222,44 +202,58 @@ const TaxForm = () => {
         status: 'error',
         message: 'Please correct the errors in the form'
       });
+      setIstaxvalid(false);
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          personalInfo: formData.personalInfo,
-          incomeDetails: formData.incomeDetails,
-          deductions: formData.deductions,
-          taxPayments: formData.taxPayments
-        })
-      });
-      const data = await response.json();
-      setValidationStatus(data);
+      const token = localStorage.getItem('token');
+      const response  = await validate({
+        token,
+        personalInfo: formData.personalInfo,
+        incomeDetails: formData.incomeDetails,
+        deductions: formData.deductions,
+        taxPayments: formData.taxPayments,
+        
+      })
+     
+      
+      setValidationStatus(response.data);
+      setIstaxvalid(true);
     } catch (error) {
+      
       setValidationStatus({
         status: 'error',
-        message: 'Validation failed'
+        message: (
+          <ul className="list-disc pl-4">
+            {error.response.data.errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        ) || 'Validation failed'
       });
+      setIstaxvalid(false);
     }
     setLoading(false);
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+    if(!istaxvalid){
+      setValidationStatus(
+        {message: 'First validate your tax data'}
+      )
+      return;
+    }
+    
 
     setLoading(true);
     try {
-      const response = await fetch('http://ec2-13-51-200-78.eu-north-1.compute.amazonaws.com:5000/api/tax/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const data = await response.json();
-      if (data.success) {
+      const token = localStorage.getItem('token');
+      const response = await submitForm ({token, formData});
+      const result = response.data;
+      if (result.success) {
         setValidationStatus({
           status: 'success',
           message: 'Tax return submitted successfully'
@@ -431,29 +425,16 @@ const TaxForm = () => {
                   />
                 </div>
 
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Salary Deductions</label>
-                  <input
-                    type="number"
-                    value={formData.incomeDetails.salary.deductions===""?"":formData.incomeDetails.salary.deductions}
-                    onChange={(e) => {
-                      const value=e.target.value;
-                      handleNestedChange('incomeDetails', 'salary', 'deductions',
-                      value===""?"":Number(value))}}
-                    className="w-full rounded-md border p-2"
-                  />
-                </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-1">Business Income</label>
                   <input
                     type="number"
-                    value={formData.incomeDetails.otherIncome.businessIncome===""?"":formData.incomeDetails.otherIncome.businessIncome}
+                    value={formData.incomeDetails.otherIncome.businessIncome === "" ? "" : formData.incomeDetails.otherIncome.businessIncome}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleNestedChange('incomeDetails', 'otherIncome', 'businessIncome',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -462,11 +443,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Capital Gains</label>
                   <input
                     type="number"
-                    value={formData.incomeDetails.otherIncome.capitalGains===""?"":formData.incomeDetails.otherIncome.capitalGains}
+                    value={formData.incomeDetails.otherIncome.capitalGains === "" ? "" : formData.incomeDetails.otherIncome.capitalGains}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleNestedChange('incomeDetails', 'otherIncome', 'capitalGains',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -479,11 +461,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Section 80C</label>
                   <input
                     type="number"
-                    value={formData.deductions.section80C===""?"":formData.deductions.section80C}
+                    value={formData.deductions.section80C === "" ? "" : formData.deductions.section80C}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('deductions', 'section80C',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -492,11 +475,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Section 80D</label>
                   <input
                     type="number"
-                    value={formData.deductions.section80D===""?"":formData.deductions.section80D}
+                    value={formData.deductions.section80D === "" ? "" : formData.deductions.section80D}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('deductions', 'section80D',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -505,11 +489,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Home Loan Interest</label>
                   <input
                     type="number"
-                    value={formData.deductions.homeLoanInterest===""?"":formData.deductions.homeLoanInterest}
+                    value={formData.deductions.homeLoanInterest === "" ? "" : formData.deductions.homeLoanInterest}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('deductions', 'homeLoanInterest',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -518,11 +503,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Education Loan Interest</label>
                   <input
                     type="number"
-                    value={formData.deductions.educationLoanInterest===""?"":formData.deductions.educationLoanInterest}
+                    value={formData.deductions.educationLoanInterest === "" ? "" : formData.deductions.educationLoanInterest}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('deductions', 'educationLoanInterest',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -531,11 +517,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Other Deductions</label>
                   <input
                     type="number"
-                    value={formData.deductions.otherDeductions===""?"":formData.deductions.otherDeductions}
+                    value={formData.deductions.otherDeductions === "" ? "" : formData.deductions.otherDeductions}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('deductions', 'otherDeductions',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -548,25 +535,27 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">TDS</label>
                   <input
                     type="number"
-                    value={formData.taxPayments.tds===""?"":formData.taxPayments.tds}
+                    value={formData.taxPayments.tds === "" ? "" : formData.taxPayments.tds}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('taxPayments', 'tds',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
-                 
+
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Advance Tax</label>
                   <input
                     type="number"
-                    value={formData.taxPayments.advanceTax===""?"":formData.taxPayments.advanceTax}
+                    value={formData.taxPayments.advanceTax === "" ? "" : formData.taxPayments.advanceTax}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('taxPayments', 'advanceTax',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>
@@ -575,11 +564,12 @@ const TaxForm = () => {
                   <label className="block text-sm font-medium mb-1">Self Assessment Tax</label>
                   <input
                     type="number"
-                    value={formData.taxPayments.selfAssessmentTax===""?"":formData.taxPayments.selfAssessmentTax}
+                    value={formData.taxPayments.selfAssessmentTax === "" ? "" : formData.taxPayments.selfAssessmentTax}
                     onChange={(e) => {
-                      const value=e.target.value;
+                      const value = e.target.value;
                       handleChange('taxPayments', 'selfAssessmentTax',
-                      value===""?"":Number(value))}}
+                        value === "" ? "" : Number(value))
+                    }}
                     className="w-full rounded-md border p-2"
                   />
                 </div>

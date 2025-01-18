@@ -7,7 +7,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -19,10 +19,11 @@ function Login() {
 
       // Save token to local storage
       localStorage.setItem("token", token);
+      localStorage.setItem("userid", user.id);
       alert(`Welcome back, ${user.name}!`);
 
       // Redirect user to dashboard
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred. Please try again.");
     } finally {

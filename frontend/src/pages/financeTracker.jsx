@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { DollarSign, Trash2 } from 'lucide-react';
+import { DollarSign, Trash2, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import IncomeExpenseForm from '../components/incomeExpenseForm';
 import { getEntries, deleteEntry } from '../utils/api';
 
 const FinanceTracker = () => {
+  const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
 
   const fetchEntries = async () => {
     try {
-      const response = await getEntries();
+      const token = localStorage.getItem('token');
+      const userid = localStorage.getItem('userid');
+
+      const response = await getEntries({ token, userid });
       setEntries(response.data);
     } catch (err) {
       console.error(err);
@@ -25,15 +30,16 @@ const FinanceTracker = () => {
   };
 
 
-const handleDeleteEntry = async (id, index) => {
+  const handleDeleteEntry = async (id, index) => {
     try {
-        const response = await deleteEntry(id);
-        console.log(response.data.message); 
-        setEntries((prevEntries) => prevEntries.filter((_, i) => i !== index));
+      const token = localStorage.getItem('token');
+      const response = await deleteEntry({ id, token });
+
+      setEntries((prevEntries) => prevEntries.filter((_, i) => i !== index));
     } catch (error) {
-        console.error(error.response?.data?.error || "Failed to delete entry");
+      console.error(error.response?.data?.error || "Failed to delete entry");
     }
-};
+  };
 
 
   const totals = entries.reduce((acc, entry) => {
@@ -52,7 +58,15 @@ const handleDeleteEntry = async (id, index) => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+      <button
+          onClick={() => navigate('/')}
+          className="mb-6 flex items-center gap-2 hover:bg-gray-100 p-0 rounded-full transition-colors duration-200"
+          aria-label="Go back to dashboard"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
         <Card className="bg-green-50">
           <CardHeader>
             <CardTitle className="text-green-700">Total Income</CardTitle>

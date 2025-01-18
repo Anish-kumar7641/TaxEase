@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { DollarSign, Tag, FileText } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { addEntry } from '../utils/api';
+
 
 const categories = {
   Income: ['Salary', 'Freelance', 'Investment Returns', 'Bonus', 'Other Income'],
@@ -9,12 +10,12 @@ const categories = {
   Investment: ['Stocks', 'Bonds', 'Real Estate', 'Mutual Funds', 'Other Investment']
 };
 
-const IncomeExpenseForm = ({ onAdd }) => {
+const IncomeExpenseForm = ({ onAdd, userId }) => {
   const [formData, setFormData] = useState({
     type: 'Income',
     category: '',
     amount: '',
-    description: ''
+    description: '',
   });
 
   const handleChange = (e) => {
@@ -29,11 +30,13 @@ const IncomeExpenseForm = ({ onAdd }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await addEntry(formData);
+      const token = localStorage.getItem('token');
+      const userid=localStorage.getItem('userid');
+      const response = await addEntry({ ...formData, token, userid });
       onAdd(response.data.entry);
-      setFormData({ type: 'Income', category: '', amount: '', description: '' });
+      setFormData({ type: 'Income', category: '', amount: '', description: '', userId });
     } catch (err) {
-      console.error("ADD ENTRY ERROR", err);
+      console.error("Error adding entry:", err);
     }
   };
 

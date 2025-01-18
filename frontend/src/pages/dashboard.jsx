@@ -1,8 +1,66 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { TrendingUp, Calculator, PieChart, FileText } from "lucide-react";
+import axios from 'axios';
+import TaxFinanceDashboard from "../components/dashboardStats";
 
-function Dashboard() {
+const Dashboard = () => {
+  const [activeCard, setActiveCard] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Simulate loading state
+    setTimeout(() => setIsLoading(false), 1000);
+  }, []);
+  
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:5000/api/dashboard/dashboard-data', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.data.success) {
+          setDashboardData(response.data.data);
+        } else {
+          throw new Error('Failed to fetch dashboard data');
+        }
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError(err.message || 'Error fetching dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+
+    // Optional: Set up polling for real-time updates
+    const intervalId = setInterval(fetchDashboardData, 5 * 60 * 1000); // Refresh every 5 minutes
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+    </div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center p-4">
+      Error: {error}
+    </div>;
+  }
+
+ 
+
   const features = [
     {
       title: "Finance Tracker",
@@ -39,103 +97,76 @@ function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Tax Management Dashboard</h1>
+        <div className="mb-8 opacity-0 animate-fade-in">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Tax Management Dashboard
+          </h1>
           <p className="text-gray-600 text-lg">
             Welcome to your comprehensive tax management suite. Simplify your tax planning, calculations, and filing with our intelligent tools.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {features.map((feature) => (
-            <Card key={feature.title} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          {features.map((feature, index) => (
+            <Card
+              key={feature.title}
+              className={`transform transition-all duration-300 hover:scale-105 
+                ${isLoading ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}
+                ${activeCard === index ? 'ring-2 ring-offset-2 ' + feature.color : ''}
+                hover:shadow-xl
+              `}
+              style={{ transitionDelay: `${index * 100}ms` }}
+              onMouseEnter={() => setActiveCard(index)}
+              onMouseLeave={() => setActiveCard(null)}
+            >
               <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <div className={`${feature.color} p-2 rounded-lg`}>
+                <div className="flex items-center space-x-3">
+                  <div className={`${feature.color} p-3 rounded-lg transform transition-transform duration-300 hover:rotate-12`}>
                     <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <CardTitle className="text-2xl">{feature.title}</CardTitle>
                 </div>
-                <p className="text-gray-600 mt-2">
+                <p className="text-gray-600 mt-3 leading-relaxed">
                   {feature.description}
                 </p>
               </CardHeader>
               <CardContent>
                 <button
                   onClick={() => window.location.href = feature.path}
-                  className={`w-full ${feature.color} ${feature.hoverColor} text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2`}
+                  className={`w-full ${feature.color} ${feature.hoverColor} text-white px-4 py-3 rounded-lg 
+                    transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg 
+                    flex items-center justify-center space-x-2 font-medium`}
                 >
                   <span>Get Started</span>
+                  <span className="transform transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </button>
               </CardContent>
             </Card>
           ))}
         </div>
-
-        {/* Quick Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
-          <Card className="bg-blue-50">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-medium text-blue-800">Monthly Savings</h3>
-              <p className="text-2xl font-bold text-blue-900">₹45,000</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-green-50">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-medium text-green-800">Tax Saved</h3>
-              <p className="text-2xl font-bold text-green-900">₹12,500</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-purple-50">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-medium text-purple-800">Investments</h3>
-              <p className="text-2xl font-bold text-purple-900">₹1,25,000</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-orange-50">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-medium text-orange-800">Due Date</h3>
-              <p className="text-2xl font-bold text-orange-900">31 Jul 2024</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity Section */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Tax return filed successfully</span>
-                </div>
-                <span className="text-sm text-gray-500">2 days ago</span>
-              </div>
-              <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>New investment added</span>
-                </div>
-                <span className="text-sm text-gray-500">5 days ago</span>
-              </div>
-              <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Tax optimization suggestions updated</span>
-                </div>
-                <span className="text-sm text-gray-500">1 week ago</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
+        }
+      `}</style>
+      <div className="container mx-auto px-4 py-8">
+      <TaxFinanceDashboard 
+        userData={dashboardData?.userData}
+        financeData={dashboardData?.financeData}
+        taxData={dashboardData?.taxData}
+      />
     </div>
+    </div>
+    
   );
-}
+};
 
 export default Dashboard;
