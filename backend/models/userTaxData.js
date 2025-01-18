@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const userTaxDataSchema = new mongoose.Schema({
+  userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
   personalInfo: {
     name: { type: String, required: true },
     panNumber: { type: String, required: true },
@@ -43,11 +48,13 @@ const userTaxDataSchema = new mongoose.Schema({
   assessmentYear: { type: String, required: true },
   status: {
     type: String,
-    enum: ['draft', 'submitted', 'verified', 'filed'],
-    default: 'draft'
+    enum: ['filed','draft'],
+    default: 'filed'
   },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Make sure to export the model correctly

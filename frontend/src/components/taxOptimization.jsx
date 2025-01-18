@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { PieChart, DollarSign, Tag } from "lucide-react";
+import { PieChart, DollarSign, Tag, ArrowLeft } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 import { getSuggestions } from "../utils/api";
 
 const TaxOptimization = () => {
+  const navigate = useNavigate();
   const [income, setIncome] = useState('');
   const [expenses, setExpenses] = useState({
     medical: '',
@@ -26,6 +28,13 @@ const TaxOptimization = () => {
 
   return (
     <div className="container mx-auto p-6">
+      <button
+        onClick={() => navigate('/')}
+        className="mb-6 flex items-center gap-2 hover:bg-gray-100 p-0 rounded-full transition-colors duration-200"
+        aria-label="Go back to dashboard"
+      >
+        <ArrowLeft className="w-6 h-6" />
+      </button>
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -37,7 +46,7 @@ const TaxOptimization = () => {
           <p className="text-gray-600 mb-6">
             Get personalized tax-saving recommendations based on your income, expenses, and current investments. Our AI analyzes your financial profile to suggest optimal tax-saving strategies.
           </p>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -56,7 +65,7 @@ const TaxOptimization = () => {
 
               <div className="space-y-4">
                 <h3 className="text-sm font-medium mb-2">Expenses Breakdown</h3>
-                {Object.entries({ 
+                {Object.entries({
                   medical: 'Medical Expenses',
                   education: 'Education Expenses',
                   housing: 'Housing Loan EMI',
@@ -67,7 +76,7 @@ const TaxOptimization = () => {
                     <input
                       type="number"
                       value={expenses[key]}
-                      onChange={(e) => setExpenses({...expenses, [key]: Number(e.target.value)})}
+                      onChange={(e) => setExpenses({ ...expenses, [key]: Number(e.target.value) })}
                       className="w-full rounded-md border border-gray-300 p-2"
                       placeholder={`Enter ${label.toLowerCase()}`}
                     />

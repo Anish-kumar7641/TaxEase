@@ -1,9 +1,13 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
-import { FileText, Clock, Shield, HelpCircle } from "lucide-react";
+import { FileText, Clock, Shield, HelpCircle,ArrowLeft } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 import TaxForm from "../components/taxForm";
 
 function TaxFilingPage() {
+
+  const navigate = useNavigate();
+
   const benefits = [
     {
       icon: Clock,
@@ -25,6 +29,15 @@ function TaxFilingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-6">
+
+      <button
+          onClick={() => navigate('/')}
+          className="mb-6 flex items-center gap-2 hover:bg-gray-100 p-0 rounded-full transition-colors duration-200"
+          aria-label="Go back to dashboard"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+
         {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">

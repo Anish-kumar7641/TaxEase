@@ -7,16 +7,28 @@ export const login = (formData) => API.post("/users/login", formData);
 export const register = (formData) => API.post("/users/register", formData);
 
 // Finance-related API calls
-export const addEntry = async (data) => {
-    return await API.post("/finance/add", data);
+export const addEntry = async ({token, userid, ...data }) => {
+    return await API.post('/finance/add', {...data, userid}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  };
+
+export const getEntries = async ({token, userid}) => {
+    return await API.post("/finance/all",{userid },{
+      headers: {
+        'Authorization' :`Bearer ${token}`
+      }
+    });
 };
 
-export const getEntries = async () => {
-    return await API.get("/finance/all");
-};
-
-export const deleteEntry = async (id) => {
-    return await API.delete(`/finance/delete/${id}`);
+export const deleteEntry = async ({id,token}) => {
+    return await API.delete(`/finance/delete/${id}`,{
+      headers:{
+        'Authorization':`Bearer ${token}`
+      }
+    });
 };
 
 //Tax calculation related
@@ -33,3 +45,27 @@ export const autoFillTaxForm = async (formData) => {
 export const validateTaxForm = async (formData) => {
     return await API.post("/tax/validate", formData);
 };
+
+//TaxForm
+export const autoFill = async({token, ...data}) => {
+  return await API.post("/tax/auto-fill", {...data},{
+    headers:{
+      'Authorization':`Bearer ${token}`
+    }
+  });
+}
+  
+export const validate = async({token, ...data}) =>{
+  return await API.post("/tax/validate", {...data},{
+    headers:{
+      'Authorization':`Bearer ${token}`
+    }
+  });
+};
+export const submitForm =async({token, ...data}) =>{
+  return await API.post("/tax/submit", {...data},{
+    headers:{
+      'Authorization':`Bearer ${token}`
+    }
+  });
+} 

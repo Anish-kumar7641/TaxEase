@@ -9,39 +9,28 @@ const autoFillTaxForm = async (req, res) => {
     // Find existing record
     const existingFiling = await UserTaxData.findOne({ 
       'personalInfo.panNumber': panNumber 
-    }).sort({ createdAt: -1 });
+    }).sort({ date: -1 });
 
     if (existingFiling) {
       // Return existing data for returning users
-      console.log("existing");
+
       return res.json({
         status: 'success',
         message: 'Previous records found',
         data: existingFiling,
         isNewUser: false
       });
-    } else if (formData) {
-      // Create new entry for first-time users
-      console.log("NOT existing");
-      const newTaxData = new UserTaxData(formData);
-      await newTaxData.save();
-      
+    } 
+    else {
+
       return res.status(201).json({
-        status: 'success',
-        message: 'New tax record created successfully',
-        data: newTaxData,
-        isNewUser: true
-      });
-    } else {
-      console.log("NO FORMDATA");
-      return res.status(404).json({
         status: 'info',
         message: 'No previous records found. Please fill in your details.',
         isNewUser: true
       });
     }
   } catch (error) {
-    console.error('Auto-fill error:', error);
+
     res.status(500).json({ 
       status: 'error',
       message: "Error processing tax form data",
@@ -55,11 +44,9 @@ const validateTaxForm = async (req, res) => {
   try {
 
     // const formData=req.body;
-    // console.log("FORMDATA",formData);
+    
     
     const {personalInfo,incomeDetails, deductions, taxPayments} = req.body;
-
-    console.log("req body",req.body);
 
     // Validation checks
     const errors = [];
@@ -77,8 +64,10 @@ const validateTaxForm = async (req, res) => {
     const totalIncome = incomeDetails.salary.gross + 
       Object.values(incomeDetails.otherIncome).reduce((a, b) => a + b, 0);
 
+
     // 3. Deductions validation
     const totalDeductions = Object.values(deductions).reduce((a, b) => a + b, 0);
+
     if (totalDeductions > totalIncome * 0.5) {
       errors.push("Total deductions cannot exceed 50% of total income");
     }
@@ -91,6 +80,7 @@ const validateTaxForm = async (req, res) => {
     // 5. Tax payments validation
     const totalTaxPaid = Object.values(taxPayments).reduce((a, b) => a + b, 0);
     // Calculate expected tax based on income slab
+
     const expectedTax = calculateTax(totalIncome, totalDeductions);
     
     if (totalTaxPaid < expectedTax) {
@@ -128,23 +118,42 @@ const validateTaxForm = async (req, res) => {
 const submitTaxReturn = async (req, res) => {
   try {
     // Create a copy of the request body and ensure no _id field is carried over
-    const taxDataPayload = { ...req.body };
-    delete taxDataPayload._id; // Remove _id if it exists in the request body
+    const {
+      formData: {
+        _id,
+        assessmentYear,
+        personalInfo,
+        incomeDetails,
+        deductions,
+        taxPayments,
+        ...rest
+      },
+    } = req.body; // Extract from formData
+	
 
-    // Create a new instance of UserTaxData with the sanitized payload
-    const taxData = new UserTaxData(taxDataPayload);
+    
+    // Create a new instance of UserTaxData with a sanitized payload
+    const taxData = new UserTaxData({
+      assessmentYear,
+      personalInfo, // Include personal information
+      userId: req.user.id, // Ensure the user ID is included
+      incomeDetails, // Add income details
+      deductions, // Add deductions
+      taxPayments, // Add tax payments
+      ...rest, // Include any additional fields
+    });
+    
 
     // Save the new tax return entry to the database
     await taxData.save();
 
-    console.log("New tax return entry created");
     res.status(201).json({
       success: true,
       message: 'Tax return submitted successfully',
       referenceNumber: taxData._id // Send the new _id as reference
     });
   } catch (error) {
-    console.error("Error creating tax return:", error.message);
+
     res.status(500).json({
       success: false,
       message: 'Failed to submit tax return',

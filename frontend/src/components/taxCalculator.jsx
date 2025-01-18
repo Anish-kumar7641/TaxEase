@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { Calculator, TrendingUp } from "lucide-react";
+import { Calculator, TrendingUp, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { calculateTax, getProjections } from "../utils/api";
 
 const TaxCalculator = () => {
+  const navigate = useNavigate();
   const [income, setIncome] = useState('');
   const [deductions, setDeductions] = useState('');
   const [growthRate, setGrowthRate] = useState('');
@@ -31,6 +33,13 @@ const TaxCalculator = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <button
+              onClick={() => navigate('/')}
+              className="mb-6 flex items-center gap-2 hover:bg-gray-100 p-0 rounded-full transition-colors duration-200"
+              aria-label="Go back to dashboard"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
