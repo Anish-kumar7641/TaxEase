@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { TrendingUp, Calculator, PieChart, FileText } from "lucide-react";
-import axios from 'axios';
+import { dashboardData } from "/utils/api";
 import TaxFinanceDashboard from "../components/dashboardStats";
 
 const Dashboard = () => {
@@ -20,11 +20,8 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/dashboard/dashboard-data', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        const token = localStorage.getItem('token');
+        const response = await dashboardData(token);
 
         if (response.data.success) {
           setDashboardData(response.data.data);
