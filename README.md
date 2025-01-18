@@ -35,7 +35,7 @@ Follow these steps to set up the project locally:
 git clone https://github.com/Anish-kumar7641/TaxEase.git
 cd TaxEase
 
-### 2. Install dependencies
+### **2. Install dependencies**
 
 For the frontend:
 cd frontend
