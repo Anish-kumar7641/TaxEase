@@ -72,3 +72,11 @@ export const submitForm =async({token, ...data}) =>{
     }
   });
 } 
+
+export const dashData =async(token) =>{
+  return await API.post("/tax/submit",{
+    headers:{
+      'Authorization':`Bearer ${token}`
+    }
+  });
+} 
