@@ -5,6 +5,8 @@ import axios from "axios";
 // const API = axios.create({baseURL:"http://localhost:5000/api"});
 const API = axios.create({baseURL:"https://taxease.onrender.com/api"});
 
+const token = localStorage.getItem('token');
+
 // User-related API calls
 export const login = (formData) => API.post("/users/login", formData);
 export const register = (formData) => API.post("/users/register", formData);
@@ -73,8 +75,8 @@ export const submitForm =async({token, ...data}) =>{
   });
 } 
 
-export const dashData =async(token) =>{
-  return await API.post("/dashboard/dashboard-data",{
+export const dashData =async() =>{
+  return await API.get("/dashboard/dashboard-data",{
     headers:{
       'Authorization':`Bearer ${token}`
     }

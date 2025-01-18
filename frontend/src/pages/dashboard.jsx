@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     // Simulate loading state
@@ -20,9 +21,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await dashData(token);
-
+        const response = await dashData();
         if (response.data.success) {
           setDashboardData(response.data.data);
         } else {
