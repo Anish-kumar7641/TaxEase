@@ -119,4 +119,4 @@ npm start
 
 ## Contributing
 
-We welcome contributions to TaxEase! Please feel free to submit issues and pull requests.
+I welcome contributions to TaxEase! Please feel free to submit issues and pull requests.
