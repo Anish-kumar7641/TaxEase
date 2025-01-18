@@ -74,7 +74,7 @@ export const submitForm =async({token, ...data}) =>{
 } 
 
 export const dashData =async(token) =>{
-  return await API.post("/tax/submit",{
+  return await API.post("/dashboard/dashboard-data",{
     headers:{
       'Authorization':`Bearer ${token}`
     }
