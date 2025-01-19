@@ -1,0 +1,12 @@
+node_modules/
+.idx/
+seeders/
+tests/
+.git/
+.gitignore
+.dockerignore
+babel.config.json
+readme.md
+Jenkinsfile
+.env
+.env.example

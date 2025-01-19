@@ -16,14 +16,15 @@ function Navbar() {
   const handleLogout = () => {
     // Remove the token from localStorage to log out the user
     localStorage.removeItem("token");
+    localStorage.removeItem("userid");
     setIsLoggedIn(false); // Update login state
-    navigate("/login"); // Redirect to login page using useNavigate
+    navigate("/"); // Redirect to login page using useNavigate
   };
 
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-white text-xl font-bold">
+        <Link to="/dashboard" className="text-white text-xl font-bold">
           TaxEase
         </Link>
         <div>
@@ -38,7 +39,7 @@ function Navbar() {
           ) : (
             // Show Login and Register buttons when the user is not logged in
             <>
-              <Link to="/login" className="text-white px-4">
+              <Link to="/" className="text-white px-4">
                 Login
               </Link>
               <Link to="/register" className="text-white px-4">

@@ -23,7 +23,7 @@ function Login() {
       alert(`Welcome back, ${user.name}!`);
 
       // Redirect user to dashboard
-      window.location.href = "/";
+      window.location.href = "/dashboard";
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred. Please try again.");
     } finally {
