@@ -86,7 +86,7 @@ const Register = () => {
       const response = await register(formData);
       setSuccess(true);
       setTimeout(() => {
-        window.location.href = "/login";
+        window.location.href = "/";
       }, 2000);
     } catch (err) {
       setApiError("An error occurred. Please try again.");

@@ -34,7 +34,7 @@ const TaxCalculator = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
               className="mb-6 flex items-center gap-2 hover:bg-gray-100 p-0 rounded-full transition-colors duration-200"
               aria-label="Go back to dashboard"
             >
