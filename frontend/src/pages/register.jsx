@@ -1,21 +1,27 @@
 import React, { useState } from "react";
 import { register } from "../utils/api";
+import { Shield, UserPlus, Lock, Mail } from "lucide-react";
 
-const InputField = ({ label, type, name, value, onChange, error }) => (
+const InputField = ({ label, type, name, value, onChange, error, icon: Icon }) => (
   <div className="mb-4">
     <label className="block text-gray-700 text-sm font-bold mb-2">
       {label}
     </label>
-    <input
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-        error ? 'border-red-500' : ''
-      }`}
-    />
-    {error && <p className="text-red-500 text-xs italic">{error}</p>}
+    <div className="relative">
+      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <Icon size={18} />
+      </div>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className={`w-full p-3 pl-10 border rounded-md focus:ring-2 focus:ring-blue-500 transition-colors ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+      />
+    </div>
+    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
   </div>
 );
 
@@ -89,60 +95,124 @@ const Register = () => {
         window.location.href = "/";
       }, 2000);
     } catch (err) {
-      setApiError("An error occurred. Please try again.");
+      setApiError(err.response?.data?.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded shadow-md">
-        {apiError && (
-          <div className="bg-red-50 text-red-500 p-3 rounded mb-4">
-            {apiError}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="container max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-8">
+        {/* Left side - Welcome Message */}
+        <div className="w-full md:w-1/2 space-y-6 text-center md:text-left">
+          <h1 className="text-4xl md:text-5xl font-bold text-blue-900">
+            Join Our Tax Management Platform
+          </h1>
+          <p className="text-lg text-gray-600">
+            Create your account and start managing your taxes and finances effectively.
+          </p>
+          
+          <div className="bg-white/80 rounded-lg shadow-sm p-6 space-y-4">
+            <h3 className="text-xl font-semibold text-blue-800">Why Choose Us?</h3>
+            
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <Shield className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-medium">Secure & Compliant</h4>
+                  <p className="text-sm text-gray-600">Your data is protected with bank-grade security</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="bg-green-100 p-2 rounded-full">
+                  <Lock className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-medium">Easy to Use</h4>
+                  <p className="text-sm text-gray-600">Intuitive interface for hassle-free tax management</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-100 p-2 rounded-full">
+                  <Mail className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h4 className="font-medium">Expert Support</h4>
+                  <p className="text-sm text-gray-600">Get help whenever you need it</p>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-        {success && (
-          <div className="bg-green-50 text-green-500 p-3 rounded mb-4">
-            Registration successful! Redirecting to login...
-          </div>
-        )}
-        
-        <InputField
-          label="Name"
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          error={errors.name}
-        />
-        <InputField
-          label="Email"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          error={errors.email}
-        />
-        <InputField
-          label="Password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          error={errors.password}
-        />
+        </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          {loading ? "Registering..." : "Register"}
-        </button>
-      </form>
+        {/* Right side - Registration Form */}
+        <div className="w-full md:w-1/2 max-w-md">
+          <div className="bg-white p-8 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Create Account</h2>
+            
+            {apiError && (
+              <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+                {apiError}
+              </div>
+            )}
+            
+            {success && (
+              <div className="mb-6 p-3 bg-green-50 border border-green-200 text-green-600 rounded-md text-sm">
+                Registration successful! Redirecting to login...
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <InputField
+                label="Full Name"
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                error={errors.name}
+                icon={UserPlus}
+              />
+              
+              <InputField
+                label="Email Address"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                icon={Mail}
+              />
+              
+              <InputField
+                label="Password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                icon={Lock}
+              />
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 rounded-md font-medium hover:bg-blue-700 transition-colors disabled:bg-blue-400"
+                disabled={loading}
+              >
+                {loading ? "Creating Account..." : "Create Account"}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-gray-600">
+              <p>Already have an account? <a href="/" className="text-blue-600 hover:text-blue-700 font-medium">Sign In</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
