@@ -3,6 +3,8 @@
 ## Overview
 TaxEase is a comprehensive tax management platform that helps individuals and businesses handle their tax obligations efficiently. The application provides automated calculations, intelligent suggestions, and real-time insights for optimal tax planning and compliance.
 
+$${\color{red}Note:- For -first- time- request(analysis)- may- take- time- because- of- cold- start- in- free- tier- hosting}$$
+
 ## Features
 
 ### 1. User Authentication and Profile Management
